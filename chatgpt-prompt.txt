@@ -1,0 +1,20 @@
+The second row of the input file contains the tournament name. Then
+there are a number of rows. One of these start with the cell
+containing "İsim". The fifth cell of this row contains the name of our
+player. There is another row, beginning with a
+cell, containing "Ulusal rating"; the fifth cell in this row contains
+the national rating of the player. After these lines, there is an
+empty row. The important table begins with a row, where the first
+cell contains the word "Tur". This row is the header for the
+table. The table ends with an empty row. Each line in this table
+contains a match between our player and an opponent. The first column of this
+table (with header "Tur") is the round number, the second column (with
+header "Masa") is the board number, the fifth column is the opponent
+name given as "First Name(s), Last Name(s)", the sixth row is the
+rating of the opponent, the ninth row is the result of the game given
+as a letter (b for white, s for black) followed by a number (1: player
+won, 0: player lost,  ½: game is a draw). The program should read all
+this information and print out a PGN file containing all the
+games. The PGN file should contain the fields "Event", "Round",
+"Board", "White", "Black", "Result". Assume that all games had only moves
+"1. e4 e5".
