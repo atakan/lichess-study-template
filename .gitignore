@@ -171,3 +171,11 @@ generate-pgn.py~
 # libre office
 .~lock*#
 
+# personal, or potentially personal files
+*.xlsx
+*.pgn
+
+
+# editor caches and similar
+.#*
+*.*~
