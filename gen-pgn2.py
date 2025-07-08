@@ -80,16 +80,46 @@ def parse_xlsx(file_path, lang):
                 board_ind = headers.index('Masa')
                 result_ind = headers.index('Sonuç')
                 opp_nam_ind = headers.index('İsim')
-                opp_rat_ind = headers.index('Rtg')
+                #print("opp_nam_ind", opp_nam_ind)
+                opp_rat_ind = opp_int_rat_ind = opp_nat_rat_ind = -1
+                if 'Rtg' in headers:
+                    ratcase = 1 # rating case 1: we have Rtg
+                    opp_rat_ind = headers.index('Rtg')
+                elif ('UKD' in headers) and ('ELO' in headers):
+                    ratcase = 2 # case 2: we have both UKD and ELO
+                    opp_int_rat_ind = headers.index('ELO')
+                    opp_nat_rat_ind = headers.index('UKD')                
+                elif 'UKD' in headers:
+                    ratcase = 3 # case 3: we have UKD but not ELO
+                    opp_nat_rat_ind = headers.index('UKD')                
+                elif 'ELO' in headers:
+                    ratcase = 4 # case 4: we have ELO but not UKD
+                    opp_int_rat_ind = headers.index('ELO')
+                else :
+                    print("something is wrong, rating for the opponent could not be found")
                 continue
             elif table_started:
                 if all(cell is None for cell in row):  # Empty row, end of table
                     break
+                if ratcase == 1:
+                    opp_rat = row[opp_rat_ind]
+                elif ratcase == 2:
+                    if ((row[opp_int_rat_ind] == 0) and
+                        (row[opp_nat_rat_ind] == 0)):
+                        opp_rat = 0
+                    elif row[opp_int_rat_ind] == 0:
+                        opp_rat = row[opp_nat_rat_ind]
+                    else :
+                        opp_rat = row[opp_int_rat_ind]
+                elif ratcase == 3:
+                    opp_rat = row[opp_nat_rat_ind]
+                else :
+                    opp_rat = row[opp_int_rat_ind]
                 games.append({
                     "round": row[round_ind],
                     "board": row[board_ind],
                     "opponent_name": capitalize_name(row[opp_nam_ind], lang),  
-                    "opponent_rating": row[opp_rat_ind], 
+                    "opponent_rating": opp_rat, 
                     "result": row[result_ind].strip(),  # Normalize result by stripping spaces
                 })
 
@@ -186,7 +216,9 @@ def main():
     # Default to Turkish if no language is specified
     lang = "tr" if args.turkish or not args.english else "en"
 
+    print("hello")
     data = parse_xlsx(args.file, lang)
+    print(data)
     generate_pgn(data, args.output)
 
 
