@@ -56,6 +56,7 @@ def parse_xlsx(file_path, lang):
     Returns:
         dict: A dictionary with tournament name, player name, player rating, and game details.
     """
+    breakpoint()
     try:
         workbook = openpyxl.load_workbook(file_path)
         sheet = workbook.active
