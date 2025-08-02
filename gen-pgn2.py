@@ -44,6 +44,25 @@ def capitalize_name(name, lang):
     else:
         raise ValueError("Unsupported language code.")
 
+def find_indices(L, elements):
+    """
+    For each element in `elements`, return its index in `L` or -1 if not found.
+
+    Args:
+        L (list): The list to search in.
+        elements (list): Elements to look for in L.
+
+    Returns:
+        list: A list of indices corresponding to each element in `elements`.
+    """
+    result = []
+    for elem in elements:
+        try:
+            idx = L.index(elem)
+        except ValueError:
+            idx = -1
+        result.append(idx)
+    return result    
 
 def parse_xlsx(file_path, lang):
     """
@@ -56,7 +75,7 @@ def parse_xlsx(file_path, lang):
     Returns:
         dict: A dictionary with tournament name, player name, player rating, and game details.
     """
-    breakpoint()
+    #breakpoint()
     try:
         workbook = openpyxl.load_workbook(file_path)
         sheet = workbook.active
@@ -77,10 +96,11 @@ def parse_xlsx(file_path, lang):
                 table_started = True  # Start of the important table
                 headers = row
                 #print(headers)
-                round_ind = headers.index('Tur')
-                board_ind = headers.index('Masa')
-                result_ind = headers.index('Sonuç')
-                opp_nam_ind = headers.index('İsim')
+                #round_ind = headers.index('Tur')
+                #board_ind = headers.index('Masa')
+                #result_ind = headers.index('Sonuç')
+                #opp_nam_ind = headers.index('İsim')
+                (round_ind, board_ind, result_ind, opp_nam_ind) = find_indices(headers, ['Tur', 'Masa', 'Sonuç', 'İsim'])
                 #print("opp_nam_ind", opp_nam_ind)
                 opp_rat_ind = opp_int_rat_ind = opp_nat_rat_ind = -1
                 if 'Rtg' in headers:
@@ -116,12 +136,29 @@ def parse_xlsx(file_path, lang):
                     opp_rat = row[opp_nat_rat_ind]
                 else :
                     opp_rat = row[opp_int_rat_ind]
+                if round_ind == -1 :
+                    roundV = "unknown"
+                else :
+                    roundV = row[round_ind]
+                if board_ind == -1 :
+                    boardV = "unknown"
+                else :
+                    boardV = row[board_ind]
+                if result_ind == -1 :
+                    resultV = "*"
+                else :
+                    resultV = row[result_ind]
+                if opp_nam_ind == -1 :
+                    opp_namV = "unknown"
+                else :
+                    opp_namV = row[opp_nam_ind]
+
                 games.append({
-                    "round": row[round_ind],
-                    "board": row[board_ind],
-                    "opponent_name": capitalize_name(row[opp_nam_ind], lang),  
+                    "round": roundV,
+                    "board": boardV,
+                    "opponent_name": capitalize_name(opp_namV, lang),  
                     "opponent_rating": opp_rat, 
-                    "result": row[result_ind].strip(),  # Normalize result by stripping spaces
+                    "result": resultV.strip(),  # Normalize result by stripping spaces
                 })
 
         return {
